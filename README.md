@@ -2,4 +2,4 @@
 ESW project
 
 Created by - 
-Bhavyajeet Singh,Pranav Kirsur and Vikrant Dewangan
+Bhavyajeet Singh, Pranav Kirsur and Vikrant Dewangan
