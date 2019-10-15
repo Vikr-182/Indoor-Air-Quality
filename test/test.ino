@@ -47,6 +47,7 @@ int number = 0;
 DHT dht(DHTPIN, DHTTYPE);
 // T OUR  ENDS    //////////////////////////////////////////////////////////////////////////////////
 
+
 // ONE M2M CODE STARTS  /////////////////////////////////////////////
 uint32_t delayMS;
 
@@ -90,7 +91,6 @@ int SERIAL_SPEED = 9600;
 
 // Global variables
 WiFiServer server(LOCAL_PORT); // HTTP Server (over WiFi). Binded to listen on LOCAL_PORT contant
-WiFiClient client;
 String context = "";
 String command = ""; // The received command
 
@@ -384,13 +384,12 @@ void task_HTTPServer()
 void setup()
 {
     // intialize the serial liaison
-    Serial.begin(SERIAL_SPEED);
-
+    
     // Connect to WiFi network
-    init_WiFi();
+//    init_WiFi();
 
     // Start HTTP server
-    init_HTTPServer();
+//    init_HTTPServer();
 
     // ######### USE THIS SPACE FOR YOUR SETUP CODE ######### //
 
@@ -399,7 +398,7 @@ void setup()
     u16 scaled_ethanol_signal, scaled_h2_signal;
     Serial.begin(115200);
     Serial.println("serial start!!");
-
+//
 #if defined(ESP8266)
     pinMode(15, OUTPUT);
     digitalWrite(15, 1);
@@ -409,8 +408,8 @@ void setup()
     while (sgp_probe() != STATUS_OK)
     {
         Serial.println("SGP failed");
-        while (1)
-            ;
+//        while (1);
+
     }
     err = sgp_measure_signals_blocking_read(&scaled_ethanol_signal,
                                             &scaled_h2_signal);
@@ -479,8 +478,6 @@ void loop()
     float t = dht.readTemperature();
     float f = dht.readTemperature(true);
 
-    String string_humidity;
-    String string_temp;
     string_humidity = String(h);
     string_temp = String(t);
 
@@ -536,8 +533,7 @@ void loop()
         Serial.println("P10:  " + String(p10));
     }
 
-    String string_CO = " ", string_NO2 = " ", string_NH3 = " ";
-
+   
     // MiCS 6814
     if (sensorConnected)
     {
@@ -694,10 +690,9 @@ void loop()
   */
 
     // Storing as a string in a single containers
-    String sensor_value_string;
-    sensor_value_string = String(string_temp) + String(",") + String(string_humidity);
-    sensor_value_string += String(string_CO)+String(",")+String(string_NO2)+String(string_NH3);
-    createCI("Team0_abc", "node_1", sensor_value_string);
+    // String sensor_value_string;
+    // sensor_value_string = String(temp) + String(",") + String(hum);
+    // createCI("Team0_abc", "node_1", sensor_value_string);
 
     // Check if the data instance was created.
     delay(15000); // DO NOT CHANGE THIS VALUE

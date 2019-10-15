@@ -247,9 +247,7 @@ void loop() {
   }
 
   // UPLOAD CODE FOR MICS 6814
-
- 
-  if (WiFi.status() != WL_CONNECTED) {
+   if (WiFi.status() != WL_CONNECTED) {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println("adarsh-iot");
     while (WiFi.status() != WL_CONNECTED) {
