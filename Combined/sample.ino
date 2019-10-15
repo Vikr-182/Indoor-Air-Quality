@@ -694,10 +694,12 @@ void loop()
   */
 
     // Storing as a string in a single containers
-    String sensor_value_string;
-    sensor_value_string = String(string_temp) + String(",") + String(string_humidity);
-    sensor_value_string += String(string_CO)+String(",")+String(string_NO2)+String(string_NH3);
-    createCI("Team0_abc", "node_1", sensor_value_string);
+     String sensor_value_string;
+    sensor_value_string = String(string_temp) + String(",") + String(string_humidity)+String(",");
+    sensor_value_string += String(string_CO)+String(",")+String(string_NO2)+String(string_NH3)+String(",");
+    sensor_value_string += String(string_p10)+String(",")+String(string_p25)+String(",");
+    sensor_value_string += String(string_tvoc)+String(",")+String(string_co2);
+    createCI("Team33_Indoor-air_pollution-3_Houses", "node_1", sensor_value_string);
 
     // Check if the data instance was created.
     delay(15000); // DO NOT CHANGE THIS VALUE

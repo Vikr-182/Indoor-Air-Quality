@@ -47,14 +47,13 @@ int number = 0;
 DHT dht(DHTPIN, DHTTYPE);
 // T OUR  ENDS    //////////////////////////////////////////////////////////////////////////////////
 
-
 // ONE M2M CODE STARTS  /////////////////////////////////////////////
 uint32_t delayMS;
 
 // ##################### Update the Wifi SSID, Password and IP adress of the server ##########
 // WIFI params
-char *WIFI_SSID = "iPhone";
-char *WIFI_PSWD = "hello1234abc";
+char *WIFI_SSID = "LAPTOP-A7EFOJ34 9462";
+char *WIFI_PSWD = "Aq57]679";
 
 String CSE_IP = "127.0.0.1";
 // #######################################################
@@ -91,6 +90,7 @@ int SERIAL_SPEED = 9600;
 
 // Global variables
 WiFiServer server(LOCAL_PORT); // HTTP Server (over WiFi). Binded to listen on LOCAL_PORT contant
+//WiFiClient client;
 String context = "";
 String command = ""; // The received command
 
@@ -316,6 +316,7 @@ void init_WiFi()
 
 void init_HTTPServer()
 {
+    Serial.println("Starting to connect to HTTP Server");
     server.begin();
     Serial.println("Local HTTP Server started !");
 }
@@ -384,12 +385,12 @@ void task_HTTPServer()
 void setup()
 {
     // intialize the serial liaison
-    
+
     // Connect to WiFi network
 //    init_WiFi();
 
     // Start HTTP server
-//    init_HTTPServer();
+    init_HTTPServer();
 
     // ######### USE THIS SPACE FOR YOUR SETUP CODE ######### //
 
@@ -398,7 +399,7 @@ void setup()
     u16 scaled_ethanol_signal, scaled_h2_signal;
     Serial.begin(115200);
     Serial.println("serial start!!");
-//
+
 #if defined(ESP8266)
     pinMode(15, OUTPUT);
     digitalWrite(15, 1);
@@ -408,8 +409,8 @@ void setup()
     while (sgp_probe() != STATUS_OK)
     {
         Serial.println("SGP failed");
-//        while (1);
-
+        while (1)
+            ;
     }
     err = sgp_measure_signals_blocking_read(&scaled_ethanol_signal,
                                             &scaled_h2_signal);
@@ -533,7 +534,7 @@ void loop()
         Serial.println("P10:  " + String(p10));
     }
 
-   
+
     // MiCS 6814
     if (sensorConnected)
     {
@@ -690,9 +691,12 @@ void loop()
   */
 
     // Storing as a string in a single containers
-    // String sensor_value_string;
-    // sensor_value_string = String(temp) + String(",") + String(hum);
-    // createCI("Team0_abc", "node_1", sensor_value_string);
+    String sensor_value_string;
+    sensor_value_string = String(string_temp) + String(",") + String(string_humidity)+String(",");
+    sensor_value_string += String(string_CO)+String(",")+String(string_NO2)+String(string_NH3)+String(",");
+    sensor_value_string += String(string_p10)+String(",")+String(string_p25)+String(",");
+    sensor_value_string += String(string_tvoc)+String(",")+String(string_co2);
+    createCI("Team33_Indoor-air_pollution-3_Houses", "node_1", sensor_value_string);
 
     // Check if the data instance was created.
     delay(15000); // DO NOT CHANGE THIS VALUE
