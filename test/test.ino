@@ -1,10 +1,9 @@
 #include <JSONVar.h>
-#include <Arduino_JSON.h>
 #include <JSON.h>
+#include <Arduino_JSON.h>
 #include "DHT.h"
 #include "ThingSpeak.h"
 #include <ESP8266WiFi.h>
-#include <Arduino.h>
 #include "sensirion_common.h"
 #include "sgp30.h"
 #include <SDS011.h>
@@ -22,12 +21,16 @@ SDS011 my_sds;
 MiCS6814 sensor;
 bool sensorConnected;
 
-#define SECRET_SSID "iPhone"     // replace MySSID with your WiFi network name
-#define SECRET_PASS "hello1234abc" // replace MyPassword with your WiFi password
+#define SECRET_SSID "iPhone"                    // BJS
+#define SECRET_PASS "hello1234abc"
+#define SECRET_SSID2 "LAPTOP-A7EFOJ34 9462"     // replace MySSID with your WiFi network name // JAIBA
+#define SECRET_PASS "Aq57]679" // replace MyPassword with your WiFi password
+#define SECRET_SSID3 "hotspot"
+#define SECRET_PASS3 "plsconnect"
 
 //----------------  Fill in your credentails   ---------------------
-char ssid[] = SECRET_SSID;                       // your network SSID (name)
-char pass[] = SECRET_PASS;                       // your network password
+char ssid[] = SECRET_SSID3;                       // your network SSID (name)
+char pass[] = SECRET_PASS3;                       // your network password
 unsigned long myChannelNumber1 = 864235;         // DHT SENSOR
 unsigned long myChannelNumber2 = 864604;         // MULTICHANNEL GAS SENSOR
 unsigned long myChannelNumber3 = 864606;         // VOC AND CO2 GAS SENSOR
@@ -40,7 +43,7 @@ const char *myWriteAPIKey4 = "RYIPO6HG7X8ZU3Y5"; // MiCS6814
 //------------------------------------------------------------------
 #define DHTPIN 2
 
-WiFiClient client;
+
 int number = 0;
 
 #define DHTTYPE DHT22 // DHT 22  (AM2302), AM2321
@@ -52,8 +55,8 @@ uint32_t delayMS;
 
 // ##################### Update the Wifi SSID, Password and IP adress of the server ##########
 // WIFI params
-char *WIFI_SSID = "LAPTOP-A7EFOJ34 9462";
-char *WIFI_PSWD = "Aq57]679";
+char *WIFI_SSID = "hotspot";
+char *WIFI_PSWD = "plsconnect";
 
 String CSE_IP = "127.0.0.1";
 // #######################################################
@@ -90,7 +93,7 @@ int SERIAL_SPEED = 9600;
 
 // Global variables
 WiFiServer server(LOCAL_PORT); // HTTP Server (over WiFi). Binded to listen on LOCAL_PORT contant
-//WiFiClient client;
+WiFiClient client;
 String context = "";
 String command = ""; // The received command
 
@@ -98,278 +101,251 @@ String command = ""; // The received command
 // param : url  --> the url path of the targted oneM2M resource on the remote CSE
 // param : ty --> content-type being sent over this POST request (2 for ae, 3 for cnt, etc.)
 // param : rep  --> the representaton of the resource in JSON format
-String doPOST(String url, int ty, String rep)
-{
+String doPOST(String url, int ty, String rep) {
 
-    String postRequest = String() + "POST " + url + " HTTP/1.1\r\n" +
-                         "Host: " + CSE_IP + ":" + CSE_HTTP_PORT + "\r\n" +
-                         "X-M2M-Origin: " + CSE_M2M_ORIGIN + "\r\n" +
-                         "Content-Type: application/json;ty=" + ty + "\r\n" +
-                         "Content-Length: " + rep.length() + "\r\n"
-                                                             "Connection: close\r\n\n" +
-                         rep;
+  String postRequest = String() + "POST " + url + " HTTP/1.1\r\n" +
+                       "Host: " + CSE_IP + ":" + CSE_HTTP_PORT + "\r\n" +
+                       "X-M2M-Origin: " + CSE_M2M_ORIGIN + "\r\n" +
+                       "Content-Type: application/json;ty=" + ty + "\r\n" +
+                       "Content-Length: " + rep.length() + "\r\n"
+                       "Connection: close\r\n\n" +
+                       rep;
 
-    // Connect to the CSE address
+  // Connect to the CSE address
 
-    Serial.println("connecting to " + CSE_IP + ":" + CSE_HTTP_PORT + " ...");
+  Serial.println("connecting to " + CSE_IP + ":" + CSE_HTTP_PORT + " ...");
 
-    // Get a client
-    WiFiClient client;
-    if (!client.connect(CSE_IP, CSE_HTTP_PORT))
-    {
-        Serial.println("Connection failed !");
-        return "error";
-    }
+  // Get a client
+  WiFiClient client;
+  if (!client.connect(CSE_IP, CSE_HTTP_PORT)) {
+    Serial.println("Connection failed !");
+    return "error";
+  }
 
-    // if connection succeeds, we show the request to be send
+  // if connection succeeds, we show the request to be send
 #ifdef DEBUG
-    Serial.println(postRequest);
+  Serial.println(postRequest);
 #endif
 
-    // Send the HTTP POST request
-    client.print(postRequest);
+  // Send the HTTP POST request
+  client.print(postRequest);
 
-    // Manage a timeout
-    unsigned long startTime = millis();
-    while (client.available() == 0)
-    {
-        if (millis() - startTime > REQUEST_TIME_OUT)
-        {
-            Serial.println("Client Timeout");
-            client.stop();
-            return "error";
-        }
+  // Manage a timeout
+  unsigned long startTime = millis();
+  while (client.available() == 0) {
+    if (millis() - startTime > REQUEST_TIME_OUT) {
+      Serial.println("Client Timeout");
+      client.stop();
+      return "error";
     }
+  }
 
-    // If success, Read the HTTP response
-    String result = "";
-    if (client.available())
-    {
-        result = client.readStringUntil('\r');
-        //    Serial.println(result);
-    }
-    while (client.available())
-    {
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-    }
-    Serial.println();
-    Serial.println("closing connection...");
-    return result;
+  // If success, Read the HTTP response
+  String result = "";
+  if (client.available()) {
+    result = client.readStringUntil('\r');
+    //    Serial.println(result);
+  }
+  while (client.available()) {
+    String line = client.readStringUntil('\r');
+    Serial.print(line);
+  }
+  Serial.println();
+  Serial.println("closing connection...");
+  return result;
 }
 
 // Method for creating an ApplicationEntity(AE) resource on the remote CSE (this is done by sending a POST request)
 // param : ae --> the AE name (should be unique under the remote CSE)
-String createAE(String ae)
-{
-    String aeRepresentation =
-        "{\"m2m:ae\": {"
-        "\"rn\":\"" +
-        ae + "\","
-             "\"api\":\"org.demo." +
-        ae + "\","
-             "\"rr\":\"true\","
-             "\"poa\":[\"http://" +
-        WiFi.localIP().toString() + ":" + LOCAL_PORT + "/" + ae + "\"]"
-                                                                  "}}";
+String createAE(String ae) {
+  String aeRepresentation =
+    "{\"m2m:ae\": {"
+    "\"rn\":\"" + ae + "\","
+    "\"api\":\"org.demo." + ae + "\","
+    "\"rr\":\"true\","
+    "\"poa\":[\"http://" + WiFi.localIP().toString() + ":" + LOCAL_PORT + "/" + ae + "\"]"
+    "}}";
 #ifdef DEBUG
-    Serial.println(aeRepresentation);
+  Serial.println(aeRepresentation);
 #endif
-    return doPOST("/" + CSE_NAME, TY_AE, aeRepresentation);
+  return doPOST("/" + CSE_NAME, TY_AE, aeRepresentation);
 }
 
 // Method for creating an Container(CNT) resource on the remote CSE under a specific AE (this is done by sending a POST request)
 // param : ae --> the targeted AE name (should be unique under the remote CSE)
 // param : cnt  --> the CNT name to be created under this AE (should be unique under this AE)
-String createCNT(String ae, String cnt)
-{
-    String cntRepresentation =
-        "{\"m2m:cnt\": {"
-        "\"rn\":\"" +
-        cnt + "\","
-              "\"min\":\"" +
-        -1 + "\""
-             "}}";
-    return doPOST("/" + CSE_NAME + "/" + ae, TY_CNT, cntRepresentation);
+String createCNT(String ae, String cnt) {
+  String cntRepresentation =
+    "{\"m2m:cnt\": {"
+    "\"rn\":\"" + cnt + "\","
+    "\"min\":\"" + -1 + "\""
+    "}}";
+  return doPOST("/" + CSE_NAME + "/" + ae, TY_CNT, cntRepresentation);
 }
 
 // Method for creating an ContentInstance(CI) resource on the remote CSE under a specific CNT (this is done by sending a POST request)
 // param : ae --> the targted AE name (should be unique under the remote CSE)
 // param : cnt  --> the targeted CNT name (should be unique under this AE)
 // param : ciContent --> the CI content (not the name, we don't give a name for ContentInstances)
-String createCI(String ae, String cnt, String ciContent)
-{
-    String ciRepresentation =
-        "{\"m2m:cin\": {"
-        "\"con\":\"" +
-        ciContent + "\""
-                    "}}";
-    return doPOST("/" + CSE_NAME + "/" + ae + "/" + cnt, TY_CI, ciRepresentation);
+String createCI(String ae, String cnt, String ciContent) {
+  String ciRepresentation =
+    "{\"m2m:cin\": {"
+    "\"con\":\"" + ciContent + "\""
+    "}}";
+  return doPOST("/" + CSE_NAME + "/" + ae + "/" + cnt, TY_CI, ciRepresentation);
 }
+
 
 // Method for creating an Subscription (SUB) resource on the remote CSE (this is done by sending a POST request)
 // param : ae --> The AE name under which the SUB will be created .(should be unique under the remote CSE)
 //          The SUB resource will be created under the COMMAND container more precisely.
-String createSUB(String ae)
-{
-    String subRepresentation =
-        "{\"m2m:sub\": {"
-        "\"rn\":\"SUB_" +
-        ae + "\","
-             "\"nu\":[\"" +
-        CSE_NAME + "/" + ae + "\"], "
-                              "\"nct\":1"
-                              "}}";
-    return doPOST("/" + CSE_NAME + "/" + ae + "/" + CMND_CNT_NAME, TY_SUB, subRepresentation);
+String createSUB(String ae) {
+  String subRepresentation =
+    "{\"m2m:sub\": {"
+    "\"rn\":\"SUB_" + ae + "\","
+    "\"nu\":[\"" + CSE_NAME + "/" + ae  + "\"], "
+    "\"nct\":1"
+    "}}";
+  return doPOST("/" + CSE_NAME + "/" + ae + "/" + CMND_CNT_NAME, TY_SUB, subRepresentation);
 }
+
 
 // Method to register a module (i.e. sensor or actuator) on a remote oneM2M CSE
-void registerModule(String module, bool isActuator, String intialDescription, String initialData)
-{
-    if (WiFi.status() == WL_CONNECTED)
-    {
-        String result;
-        // 1. Create the ApplicationEntity (AE) for this sensor
-        result = createAE(module);
-        if (result == HTTP_CREATED)
-        {
+void registerModule(String module, bool isActuator, String intialDescription, String initialData) {
+  if (WiFi.status() == WL_CONNECTED) {
+    String result;
+    // 1. Create the ApplicationEntity (AE) for this sensor
+    result = createAE(module);
+    if (result == HTTP_CREATED) {
 #ifdef DEBUG
-            Serial.println("AE " + module + " created  !");
+      Serial.println("AE " + module + " created  !");
 #endif
 
-            // 2. Create a first container (CNT) to store the description(s) of the sensor
-            result = createCNT(module, DESC_CNT_NAME);
-            if (result == HTTP_CREATED)
-            {
+      // 2. Create a first container (CNT) to store the description(s) of the sensor
+      result = createCNT(module, DESC_CNT_NAME);
+      if (result == HTTP_CREATED) {
 #ifdef DEBUG
-                Serial.println("CNT " + module + "/" + DESC_CNT_NAME + " created  !");
+        Serial.println("CNT " + module + "/" + DESC_CNT_NAME + " created  !");
 #endif
 
-                // Create a first description under this container in the form of a ContentInstance (CI)
-                result = createCI(module, DESC_CNT_NAME, intialDescription);
-                if (result == HTTP_CREATED)
-                {
-#ifdef DEBUG
-                    Serial.println("CI " + module + "/" + DESC_CNT_NAME + "/{initial_description} created !");
-#endif
-                }
-            }
 
-            // 3. Create a second container (CNT) to store the data  of the sensor
-            result = createCNT(module, DATA_CNT_NAME);
-            if (result == HTTP_CREATED)
-            {
+        // Create a first description under this container in the form of a ContentInstance (CI)
+        result = createCI(module, DESC_CNT_NAME, intialDescription);
+        if (result == HTTP_CREATED) {
 #ifdef DEBUG
-                Serial.println("CNT " + module + "/" + DATA_CNT_NAME + " created !");
+          Serial.println("CI " + module + "/" + DESC_CNT_NAME + "/{initial_description} created !");
 #endif
-
-                // Create a first data value under this container in the form of a ContentInstance (CI)
-                result = createCI(module, DATA_CNT_NAME, initialData);
-                if (result == HTTP_CREATED)
-                {
-#ifdef DEBUG
-                    Serial.println("CI " + module + "/" + DATA_CNT_NAME + "/{initial_aata} created !");
-#endif
-                }
-            }
-
-            // 3. if the module is an actuator, create a third container (CNT) to store the received commands
-            if (isActuator)
-            {
-                result = createCNT(module, CMND_CNT_NAME);
-                if (result == HTTP_CREATED)
-                {
-#ifdef DEBUG
-                    Serial.println("CNT " + module + "/" + CMND_CNT_NAME + " created !");
-#endif
-
-                    // subscribe to any ne command put in this container
-                    result = createSUB(module);
-                    if (result == HTTP_CREATED)
-                    {
-#ifdef DEBUG
-                        Serial.println("SUB " + module + "/" + CMND_CNT_NAME + "/SUB_" + module + " created !");
-#endif
-                    }
-                }
-            }
         }
+      }
+
+      // 3. Create a second container (CNT) to store the data  of the sensor
+      result = createCNT(module, DATA_CNT_NAME);
+      if (result == HTTP_CREATED) {
+#ifdef DEBUG
+        Serial.println("CNT " + module + "/" + DATA_CNT_NAME + " created !");
+#endif
+
+        // Create a first data value under this container in the form of a ContentInstance (CI)
+        result = createCI(module, DATA_CNT_NAME, initialData);
+        if (result == HTTP_CREATED) {
+#ifdef DEBUG
+          Serial.println("CI " + module + "/" + DATA_CNT_NAME + "/{initial_aata} created !");
+#endif
+        }
+      }
+
+      // 3. if the module is an actuator, create a third container (CNT) to store the received commands
+      if (isActuator) {
+        result = createCNT(module, CMND_CNT_NAME);
+        if (result == HTTP_CREATED) {
+#ifdef DEBUG
+          Serial.println("CNT " + module + "/" + CMND_CNT_NAME + " created !");
+#endif
+
+          // subscribe to any ne command put in this container
+          result = createSUB(module);
+          if (result == HTTP_CREATED) {
+#ifdef DEBUG
+            Serial.println("SUB " + module + "/" + CMND_CNT_NAME + "/SUB_" + module + " created !");
+#endif
+          }
+        }
+      }
     }
+  }
 }
 
-void init_WiFi()
-{
-    Serial.println("Connecting to  " + String(WIFI_SSID) + " ...");
-    WiFi.persistent(false);
-    WiFi.begin(WIFI_SSID, WIFI_PSWD);
 
-    // wait until the device is connected to the wifi network
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(WIFI_DELAY);
-        Serial.print(".");
-    }
+void init_WiFi() {
+  Serial.println("Connecting to  " + String(WIFI_SSID) + " ...");
+  WiFi.persistent(false);
+  WiFi.begin(WIFI_SSID, WIFI_PSWD);
 
-    // Connected, show the obtained ip address
-    Serial.println("WiFi Connected ==> IP Address = " + WiFi.localIP().toString());
+  // wait until the device is connected to the wifi network
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(WIFI_DELAY);
+    Serial.print(".");
+  }
+
+  // Connected, show the obtained ip address
+  Serial.println("WiFi Connected ==> IP Address = " + WiFi.localIP().toString());
 }
 
-void init_HTTPServer()
-{
-    Serial.println("Starting to connect to HTTP Server");
-    server.begin();
-    Serial.println("Local HTTP Server started !");
+void init_HTTPServer() {
+  server.begin();
+  Serial.println("Local HTTP Server started !");
 }
 
-void task_HTTPServer()
-{
-    // Check if a client is connected
-    client = server.available();
-    if (!client)
-        return;
+void task_HTTPServer() {
+  // Check if a client is connected
+  client = server.available();
+  if (!client)
+    return;
 
-    // Wait until the client sends some data
-    Serial.println("New client connected. Receiving request... ");
-    while (!client.available())
-    {
+  // Wait until the client sends some data
+  Serial.println("New client connected. Receiving request... ");
+  while (!client.available()) {
 #ifdef DEBUG_MODE
-        Serial.print(".");
+    Serial.print(".");
 #endif
-        delay(5);
-    }
+    delay(5);
+  }
 
-    // Read the request
-    String request = client.readString();
-    Serial.println(request);
-    client.flush();
+  // Read the request
+  String request = client.readString();
+  Serial.println(request);
+  client.flush();
 
-    int start, end;
-    // identify the right module (sensor or actuator) that received the notification
-    // the URL used is ip:port/ae
-    start = request.indexOf("/");
-    end = request.indexOf("HTTP") - 1;
-    context = request.substring(start + 1, end);
+
+
+  int start, end;
+  // identify the right module (sensor or actuator) that received the notification
+  // the URL used is ip:port/ae
+  start = request.indexOf("/");
+  end = request.indexOf("HTTP") - 1;
+  context = request.substring(start + 1, end);
 #ifdef DEBUG
-    Serial.println(String() + start + " , " + end + " -> " + context + ".");
+  Serial.println(String() + start + " , " + end + " -> " + context + ".");
 #endif
 
-    // ingore verification messages
-    if (request.indexOf("vrq") > 0)
-    {
-        client.flush();
-        return;
-    }
 
-    //Parse the request and identify the requested command from the device
-    //Request should be like "[operation_name]"
-    start = request.indexOf("[");
-    end = request.indexOf("]"); // first occurence of
-    command = request.substring(start + 1, end);
-#ifdef DEBUG
-    Serial.println(String() + start + " , " + end + " -> " + command + ".");
-#endif
-
+  // ingore verification messages
+  if (request.indexOf("vrq") > 0) {
     client.flush();
+    return;
+  }
+
+
+  //Parse the request and identify the requested command from the device
+  //Request should be like "[operation_name]"
+  start = request.indexOf("[");
+  end = request.indexOf("]"); // first occurence of
+  command = request.substring(start + 1, end);
+#ifdef DEBUG
+  Serial.println(String() + start + " , " + end + " -> " + command + ".");
+#endif
+
+  client.flush();
 }
 
 /////////////////////////////////////////////////////////////////////////////////
