@@ -27,10 +27,19 @@ bool sensorConnected;
 #define SECRET_PASS "Aq57]679" // replace MyPassword with your WiFi password
 #define SECRET_SSID3 "hotspot"
 #define SECRET_PASS3 "plsconnect"
+#define SECRET_SSID4 "VIKRANT_LAPTOP"
+#define SECRET_PASS4 "62y978{V"
+#define SECRET_SSID5 "bat"
+#define SECRET_PASS5 "nanananabatman"
+#define SECRET_SSID6 "kvaditya-Inspiron-7520"
+#define SECRET_PASS6 "Us555zCI"
+#define SECRET_SSID7 "moto g"
+#define SECRET_PASS7 "justmonika"
+
 
 //----------------  Fill in your credentails   ---------------------
-char ssid[] = SECRET_SSID3;                       // your network SSID (name)
-char pass[] = SECRET_PASS3;                       // your network password
+char ssid[] = SECRET_SSID7;                       // your network SSID (name)
+char pass[] = SECRET_PASS7;                       // your network password
 unsigned long myChannelNumber1 = 864235;         // DHT SENSOR
 unsigned long myChannelNumber2 = 864604;         // MULTICHANNEL GAS SENSOR
 unsigned long myChannelNumber3 = 864606;         // VOC AND CO2 GAS SENSOR
@@ -39,6 +48,7 @@ const char *myWriteAPIKey1 = "1GG831U840UZ9GBW"; // DHT22
 const char *myWriteAPIKey2 = "X9XZ4LAJY4PLQEAE"; // SGP30
 const char *myWriteAPIKey3 = "L9GJIC50DXADAVN3"; // SDS011
 const char *myWriteAPIKey4 = "RYIPO6HG7X8ZU3Y5"; // MiCS6814
+
 
 //------------------------------------------------------------------
 #define DHTPIN 2
@@ -55,10 +65,10 @@ uint32_t delayMS;
 
 // ##################### Update the Wifi SSID, Password and IP adress of the server ##########
 // WIFI params
-char *WIFI_SSID = "hotspot";
-char *WIFI_PSWD = "plsconnect";
+char WIFI_SSID[] = SECRET_SSID7;
+char WIFI_PSWD[] = SECRET_PASS7;
 
-String CSE_IP = "127.0.0.1";
+String CSE_IP = "139.59.42.21";
 // #######################################################
 
 int WIFI_DELAY = 100; //ms
@@ -101,7 +111,8 @@ String command = ""; // The received command
 // param : url  --> the url path of the targted oneM2M resource on the remote CSE
 // param : ty --> content-type being sent over this POST request (2 for ae, 3 for cnt, etc.)
 // param : rep  --> the representaton of the resource in JSON format
-String doPOST(String url, int ty, String rep) {
+String doPOST(String url, int ty, String rep) 
+{
 
   String postRequest = String() + "POST " + url + " HTTP/1.1\r\n" +
                        "Host: " + CSE_IP + ":" + CSE_HTTP_PORT + "\r\n" +
@@ -116,8 +127,8 @@ String doPOST(String url, int ty, String rep) {
   Serial.println("connecting to " + CSE_IP + ":" + CSE_HTTP_PORT + " ...");
 
   // Get a client
-  WiFiClient client;
-  if (!client.connect(CSE_IP, CSE_HTTP_PORT)) {
+  WiFiClient client2;
+  if (!client2.connect("139.59.42.21", CSE_HTTP_PORT)) {
     Serial.println("Connection failed !");
     return "error";
   }
@@ -128,26 +139,27 @@ String doPOST(String url, int ty, String rep) {
 #endif
 
   // Send the HTTP POST request
-  client.print(postRequest);
+  client2.print(postRequest);
 
   // Manage a timeout
   unsigned long startTime = millis();
-  while (client.available() == 0) {
+  while (client2.available() == 0) {
     if (millis() - startTime > REQUEST_TIME_OUT) {
       Serial.println("Client Timeout");
-      client.stop();
+      client2.stop();
       return "error";
     }
   }
 
   // If success, Read the HTTP response
   String result = "";
-  if (client.available()) {
-    result = client.readStringUntil('\r');
+  if (client2.available()) 
+  {
+    result = client2.readStringUntil('\r');
     //    Serial.println(result);
   }
-  while (client.available()) {
-    String line = client.readStringUntil('\r');
+  while (client2.available()) {
+    String line = client2.readStringUntil('\r');
     Serial.print(line);
   }
   Serial.println();
