@@ -11,6 +11,12 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_Sensor.h>
+typedef int ll;
+
+////////////////////////////////////////////////////////////////////////////
+///////////////////      ! ERROR CORRECTED CODE     ////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
 
 // T START OF THINGSPEAK CODE ////////////////////////////////////////////////////////////////////////
 
@@ -35,6 +41,8 @@ bool sensorConnected;
 #define SECRET_PASS6 "Us555zCI"
 #define SECRET_SSID7 "moto g"
 #define SECRET_PASS7 "justmonika"
+#define SECRET_SSID8 "yoogottam"
+#define SECRET_PASS8 "plis_/\\_plis"
 
 
 //----------------  Fill in your credentails   ---------------------
@@ -43,15 +51,39 @@ char pass[] = SECRET_PASS7;                       // your network password
 unsigned long myChannelNumber1 = 864235;         // DHT SENSOR
 unsigned long myChannelNumber2 = 864604;         // MULTICHANNEL GAS SENSOR
 unsigned long myChannelNumber3 = 864606;         // VOC AND CO2 GAS SENSOR
-unsigned long myChannelNumber4 = 864607;         // 
+unsigned long myChannelNumber4 = 864607;         // NOVA PM SENSOR
+unsigned long myChannelNumber1_error = 889198;   // ERROR FOR NODE 1
+unsigned long myChannelNumber2_error = 889198;   // ERROR FOR NODE 1
+unsigned long myChannelNumber3_error = 889198;   // ERROR FOR NODE 1
+unsigned long myChannelNumber4_error = 889198;   // ERROR FOR NODE 1
 const char *myWriteAPIKey1 = "1GG831U840UZ9GBW"; // DHT22
 const char *myWriteAPIKey2 = "X9XZ4LAJY4PLQEAE"; // SGP30
 const char *myWriteAPIKey3 = "L9GJIC50DXADAVN3"; // SDS011
 const char *myWriteAPIKey4 = "RYIPO6HG7X8ZU3Y5"; // MiCS6814
+const char *myWriteAPIKey_error1 = "7CW3LB57A1AT55UC"; //node_1
+const char *myWriteAPIKey_error2 = "EWF0EVL573HCI4JS"; //node_2
+const char *myWriteAPIKey_error3 = "MLCI9LXWTRBOJUMI"; //node_3
+const char *myWriteAPIKey_error4 = "O5DNMDYI3QT1AL2Z"; //node_4
 
 
 //------------------------------------------------------------------
 #define DHTPIN 2
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+//                                    ERROR VARIABLES                                     //
+double DHT_TEMP_MAX, DHT_HUMIDITY_MAX, DHT_HUMIDITY_DEFAULT, DHT_TEMP_DEFAULT, DHT_TEMP_CURR, DHT_HUMIDITY_CURR;
+double SDS_PM25_MAX, SDS_PM10_MAX, SDS_PM25_DEFAULT, SDS_PM10_DEFAULT, SDS_PM25_CURR, SDS_PM10_CURR;
+double SGP30_ECO2_MAX, SGP30_TVOC_MAX, SGP30_ECO2_DEFAULT, SGP30_TVOC_DEFAULT, SGP30_ECO2_CURR, SGP30_TVOC_CURR;
+double MICS_CO_MAX, MICS_NH3_MAX, MICS_NO2_MAX, MICS_CO_DEFAULT, MICS_NH3_DEFAULT, MICS_NO2_DEFAULT, MICS_CO_CURR, MICS_NH3_CURR, MICS_NO2_CURR;
+
+//                                    END OF ERROR VARIABLES                              //
+//                           ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 int number = 0;
@@ -106,6 +138,70 @@ WiFiServer server(LOCAL_PORT); // HTTP Server (over WiFi). Binded to listen on L
 WiFiClient client;
 String context = "";
 String command = ""; // The received command
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////// ERROR HANDLING FUNCTIONS ////////////////////////////////////////////////
+
+void init_error()
+{
+  DHT_TEMP_DEFAULT = 28.111;
+  DHT_TEMP_CURR = DHT_TEMP_DEFAULT;
+  DHT_HUMIDITY_DEFAULT = 78.222;
+  DHT_HUMIDITY_CURR = DHT_HUMIDITY_DEFAULT;
+  DHT_TEMP_MAX = 40.555;
+  DHT_HUMIDITY_MAX = 100;
+
+  SDS_PM25_DEFAULT = 25;
+  SDS_PM25_CURR = SDS_PM25_DEFAULT;
+  SDS_PM25_MAX = 1000;
+  SDS_PM10_DEFAULT = 30;
+  SDS_PM10_CURR = SDS_PM10_DEFAULT;
+  SDS_PM10_MAX = 1000;
+
+  SGP30_TVOC_DEFAULT = 10;
+  SGP30_TVOC_CURR = SGP30_TVOC_DEFAULT;
+  SGP30_TVOC_MAX = 1000;
+  SGP30_ECO2_DEFAULT = 415;
+  SGP30_ECO2_CURR = SGP30_ECO2_DEFAULT;
+  SGP30_ECO2_MAX = 10000;
+
+  MICS_CO_DEFAULT = 30.66;
+  MICS_CO_CURR = MICS_CO_DEFAULT;
+  MICS_CO_MAX = 40;
+  MICS_NH3_DEFAULT = 0.06;
+  MICS_NH3_CURR = MICS_NH3_DEFAULT;
+  MICS_NH3_MAX = 0.9;
+  MICS_NO2_DEFAULT = 16.66;
+  MICS_NO2_CURR = MICS_NO2_DEFAULT;
+  MICS_NO2_MAX = 100;
+}
+
+void error_handle(String &a,double maximum,double default_value,int num)
+{
+    double value = a.toFloat();
+    Serial.println("La");
+    Serial.println(String(value));
+    if(value > maximum || value < 0)
+    {
+      Serial.print("Got this value at\t");
+      Serial.print(String(num));
+      Serial.print("\t");
+      Serial.println(String(value));
+      value = default_value;
+      ThingSpeak.setField(num,String(value));
+      for (ll i = 1; i <= 8; i++)
+      {
+        if(i != num)
+        {
+          ThingSpeak.setField(i,String(0));
+        }
+      }
+      
+      ThingSpeak.writeFields(myChannelNumber1_error,myWriteAPIKey_error1);
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
 
 // Method for creating an HTTP POST with preconfigured oneM2M headers
 // param : url  --> the url path of the targted oneM2M resource on the remote CSE

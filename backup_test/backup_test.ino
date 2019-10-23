@@ -4,7 +4,7 @@
 
 #include <JSONVar.h>
 #include <JSON.h>
-#include <Arduino_JSON.h>
+#include <Arduino_JSON.h>                                                         
 #include "DHT.h"
 #include "ThingSpeak.h"
 #include <ESP8266WiFi.h>
@@ -16,6 +16,7 @@
 #include <SoftwareSerial.h>
 #include <Adafruit_Sensor.h>
 #include <time.h>
+typedef int ll;
 
 // T START OF THINGSPEAK CODE ////////////////////////////////////////////////////////////////////////
 
@@ -42,28 +43,43 @@ bool sensorConnected;
 #define SECRET_PASS7 "justmonika"
 #define SECRET_SSID8 "yoogottam"
 #define SECRET_PASS8 "plis_/\\_plis"
-char CURRENT_SSID[] = SECRET_SSID5;
-char CURRENT_PASS[] = SECRET_PASS5;
+
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////   MAIN WIFI DETAILS OF DEPLOYMENT SITE /////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+#define MAIN_SSID "moto g"
+#define MAIN_PASS "justmonika" 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+char CURRENT_SSID[] = MAIN_SSID;//SECRET_SSID7;
+char CURRENT_PASS[] = MAIN_PASS;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 //                                    ERROR VARIABLES                                     //
+
 double DHT_TEMP_MAX, DHT_HUMIDITY_MAX, DHT_HUMIDITY_DEFAULT, DHT_TEMP_DEFAULT, DHT_TEMP_CURR, DHT_HUMIDITY_CURR;
 double SDS_PM25_MAX, SDS_PM10_MAX, SDS_PM25_DEFAULT, SDS_PM10_DEFAULT, SDS_PM25_CURR, SDS_PM10_CURR;
 double SGP30_ECO2_MAX, SGP30_TVOC_MAX, SGP30_ECO2_DEFAULT, SGP30_TVOC_DEFAULT, SGP30_ECO2_CURR, SGP30_TVOC_CURR;
 double MICS_CO_MAX, MICS_NH3_MAX, MICS_NO2_MAX, MICS_CO_DEFAULT, MICS_NH3_DEFAULT, MICS_NO2_DEFAULT, MICS_CO_CURR, MICS_NH3_CURR, MICS_NO2_CURR;
 
 //                                    END OF ERROR VARIABLES                              //
-//                           ///////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
 //----------------  Fill in your credentails   ---------------------
-char ssid[] = CURRENT_SSID;                      // your network SSID (name)
-char pass[] = CURRENT_PASS;                      // your network password
+char ssid[] = MAIN_SSID;                      // your network SSID (name)
+char pass[] = MAIN_PASS;                      // your network password
+char WIFI_SSID[] = MAIN_SSID;                 // WiFi for ThingSpeak part
+char WIFI_PSWD[] = MAIN_PASS;                 // WiFi for OneM2M part
 unsigned long myChannelNumber1 = 864235;         // DHT SENSOR
 unsigned long myChannelNumber2 = 864604;         // MULTICHANNEL GAS SENSOR
 unsigned long myChannelNumber3 = 864606;         // VOC AND CO2 GAS SENSOR
@@ -95,9 +111,6 @@ uint32_t delayMS;
 
 // ##################### Update the Wifi SSID, Password and IP adress of the server ##########
 // WIFI params
-char WIFI_SSID[] = CURRENT_SSID;
-char WIFI_PSWD[] = CURRENT_PASS;
-
 String CSE_IP = "139.59.42.21";
 // #######################################################
 
@@ -160,19 +173,39 @@ void init_error()
   MICS_CO_MAX = 40;
   MICS_NH3_DEFAULT = 0.06;
   MICS_NH3_CURR = MICS_NH3_DEFAULT;
-  MICS_NH3_MAX = 0.9;
+  MICS_NH3_MAX = 110.9;
   MICS_NO2_DEFAULT = 16.66;
   MICS_NO2_CURR = MICS_NO2_DEFAULT;
   MICS_NO2_MAX = 100;
 }
 
-void error_handle(String &a,double maximum,double default_value,int num)
+double error_handle(String a,double maximum,double default_value,int num)
 {
-    double value = atof(a);
+    double value = a.toFloat();
+
+      Serial.print("Got a value at \t");
+      Serial.print(num);
+      Serial.print(":\t:value:");
+      Serial.println(value);
     if(value > maximum || value < 0)
     {
+      Serial.print("Got faulty value at \t");
+      Serial.print(num);
+      Serial.print(":\t:value:");
+      Serial.println(value);
       value = default_value;
+      ThingSpeak.setField(num,String(value));
+      for (ll i = 1; i <= 8; i++)
+      {
+        if(i != num)
+        {
+          ThingSpeak.setField(i,String(0));
+        }
+      }
+      
+      ThingSpeak.writeFields(myChannelNumber1_error,myWriteAPIKey_error1);
     }
+    return value;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +305,7 @@ void setup()
   //    init_WiFi();
 
   // Start HTTP server
-  init_HTTPServer();
+//  init_HTTPServer();
 
   // ######### USE THIS SPACE FOR YOUR SETUP CODE ######### //
 
@@ -458,10 +491,10 @@ void loop()
     }
     Serial.println("\nConnected.");
   }
-
-  error_handle(&string_temp,DHT_TEMP_MAX,DHT_TEMP_DEFAULT,1); DHT_TEMP_DEFAULT = atof(t);
-  error_handle(&string_humidity,DHT_TEMP_MAX,DHT_HUMIDITY_DEFAULT,1); DHT_HUMIDITY_DEFAULT = atof(h);
-  error_handle(hif,2,2);    // to check if pushed correctly
+  double ok;
+  ok = error_handle(string_temp,DHT_TEMP_MAX,DHT_TEMP_DEFAULT,1); DHT_TEMP_DEFAULT = ok;string_temp = String(ok);
+  ok = error_handle(string_humidity,DHT_HUMIDITY_MAX,DHT_HUMIDITY_DEFAULT,1); DHT_HUMIDITY_DEFAULT = ok; string_humidity = String(ok);
+//  error_handle(hif,2,2);    // to check if pushed correctly
   ThingSpeak.setField(1, string_temp);
   ThingSpeak.setField(2, string_humidity);
   ThingSpeak.setField(3, String(hif));
@@ -491,9 +524,9 @@ void loop()
   }
 
   
-  error_handle(&string_tvoc_ppb,SGP30_TVOC_MAX,SGP30_TVOC_DEFAULT,7); SGP30_TVOC_DEFAULT = atof(string_tvoc_ppb);
-  error_handle(&string_co2,SGP30_ECO2_MAX,SGP30_ECO2_DEFAULT,8); SGP30_ECO2_DEFAULT = atof(string_co2);
-  ThingSpeak.setField(1, (string_tvoc_ppb));
+  ok = error_handle(string_tvoc,SGP30_TVOC_MAX,SGP30_TVOC_DEFAULT,7); SGP30_TVOC_DEFAULT = ok;string_tvoc = String(ok);
+  ok = error_handle(string_co2,SGP30_ECO2_MAX,SGP30_ECO2_DEFAULT,8); SGP30_ECO2_DEFAULT = ok; string_co2 = String(ok);
+  ThingSpeak.setField(1, (string_tvoc));
   ThingSpeak.setField(2, (string_co2));
 
   x = ThingSpeak.writeFields(myChannelNumber2, myWriteAPIKey2);
@@ -520,8 +553,8 @@ void loop()
     Serial.println("\nConnected.");
   }
 
-  error_handle(&sting_p25,SDS_PM25_MAX,SDS_PM25_DEFAULT,2); SDS_PM25_DEFAULT = String(string_pm25);
-  error_handle(&sting_p10,SDS_PM10_MAX,SDS_PM10_DEFAULT,3); SDS_PM25_DEFAULT = String(string_pm10);
+  ok = error_handle(string_p25,SDS_PM25_MAX,SDS_PM25_DEFAULT,2); SDS_PM25_DEFAULT = (ok); string_p25 = String(ok);
+  ok = error_handle(string_p10,SDS_PM10_MAX,SDS_PM10_DEFAULT,3); SDS_PM10_DEFAULT = (ok); string_p10 = String(ok);
   ThingSpeak.setField(1, string_p25);
   ThingSpeak.setField(2, string_p10);
 
@@ -549,9 +582,9 @@ void loop()
     Serial.println("\nConnected.");
   }
 
-  error_handle(&string_CO,MICS_CO_MAX,MICS_CO_DEFAULT,4);
-  error_handle(&string_NO2,MICS_NO2_MAX,MICS_NO2_DEFAULT,5);
-  error_handle(&string_NH3,MICS_NH3_MAX,MICS_NH3_DEFAULT,6);
+  ok = error_handle(string_CO,MICS_CO_MAX,MICS_CO_DEFAULT,4); string_CO = String(ok);MICS_CO_DEFAULT = ok;
+  ok = error_handle(string_NO2,MICS_NO2_MAX,MICS_NO2_DEFAULT,5); string_NO2 = String(ok); MICS_NO2_DEFAULT = ok;
+  ok = error_handle(string_NH3,MICS_NH3_MAX,MICS_NH3_DEFAULT,6); string_NH3 = String(ok); MICS_NH3_DEFAULT = ok;
   ThingSpeak.setField(1, string_CO);
   ThingSpeak.setField(2, string_NO2);
   ThingSpeak.setField(3, string_NH3);
