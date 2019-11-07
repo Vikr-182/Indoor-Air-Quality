@@ -8,8 +8,11 @@ todos = json.loads(response.text)
 
 #print(todos['feeds'])
 
+print(todos)
 j = 0
+'''
 for i in todos['feeds']:
     print(i['created_at'],end="")
     print(",",end="")
     print(i['field1'])
+'''
