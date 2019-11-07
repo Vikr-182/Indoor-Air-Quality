@@ -48,8 +48,8 @@ bool sensorConnected;
 /////////////////////   MAIN WIFI DETAILS OF DEPLOYMENT SITE /////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAIN_SSID SECRET_SSID
-#define MAIN_PASS SECRET_PASS
+#define MAIN_SSID "MISHUKU"
+#define MAIN_PASS "setagaya"
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -80,18 +80,18 @@ char ssid[] = MAIN_SSID;                      // your network SSID (name)
 char pass[] = MAIN_PASS;                      // your network password
 char WIFI_SSID[] = MAIN_SSID;                 // WiFi for ThingSpeak part
 char WIFI_PSWD[] = MAIN_PASS;                 // WiFi for OneM2M part
-unsigned long myChannelNumber1 = 864235;         // DHT SENSOR
-unsigned long myChannelNumber2 = 864604;         // MULTICHANNEL GAS SENSOR
-unsigned long myChannelNumber3 = 864606;         // VOC AND CO2 GAS SENSOR
-unsigned long myChannelNumber4 = 864607;         // NOVA PM SENSOR
+unsigned long myChannelNumber1 = 900845;         // DHT SENSOR
+unsigned long myChannelNumber2 = 900846;         // NOVA PM SENSOR
+unsigned long myChannelNumber3 = 900848;         // VOC AND CO2 GAS SENSOR
+unsigned long myChannelNumber4 = 900849;         // MULTICHANNEL GAS SENSOR
 unsigned long myChannelNumber1_error = 889198;   // ERROR FOR NODE 1
 unsigned long myChannelNumber2_error = 889198;   // ERROR FOR NODE 1
 unsigned long myChannelNumber3_error = 889198;   // ERROR FOR NODE 1
 unsigned long myChannelNumber4_error = 889198;   // ERROR FOR NODE 1
-const char *myWriteAPIKey1 = "1GG831U840UZ9GBW"; // DHT22
-const char *myWriteAPIKey2 = "X9XZ4LAJY4PLQEAE"; // SGP30
-const char *myWriteAPIKey3 = "L9GJIC50DXADAVN3"; // SDS011
-const char *myWriteAPIKey4 = "RYIPO6HG7X8ZU3Y5"; // MiCS6814
+const char *myWriteAPIKey1 = "MJ7O2FZ34Q8138F5"; // DHT22
+const char *myWriteAPIKey2 = "DGSJGDKEZBMKBSCW"; // SDS011
+const char *myWriteAPIKey3 = "HF5G68OFZMZC81XB"; // SGP30
+const char *myWriteAPIKey4 = "2O2P90MY64BMVXYI"; // MiCS6814
 const char *myWriteAPIKey_error1 = "7CW3LB57A1AT55UC"; //node_1
 const char *myWriteAPIKey_error2 = "EWF0EVL573HCI4JS"; //node_2
 const char *myWriteAPIKey_error3 = "MLCI9LXWTRBOJUMI"; //node_3
@@ -529,7 +529,7 @@ void loop()
   ThingSpeak.setField(1, (string_tvoc));
   ThingSpeak.setField(2, (string_co2));
 
-  x = ThingSpeak.writeFields(myChannelNumber2, myWriteAPIKey2);
+  x = ThingSpeak.writeFields(myChannelNumber3, myWriteAPIKey2);
   if (x == 200)
   {
     Serial.println("Channel update successful.");
@@ -558,7 +558,7 @@ void loop()
   ThingSpeak.setField(1, string_p25);
   ThingSpeak.setField(2, string_p10);
 
-  x = ThingSpeak.writeFields(myChannelNumber3, myWriteAPIKey3);
+  x = ThingSpeak.writeFields(myChannelNumber2, myWriteAPIKey3);
   if (x == 200)
   {
     Serial.println("Channel update successful.");
