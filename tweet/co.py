@@ -11,7 +11,7 @@ import requests
 import datetime
 from datetime import timedelta
 
-response = requests.get("https://api.thingspeak.com/channels/900845/fields/1?api_key=HKJF50PJ4NF1ZGC2")
+response = requests.get("https://api.thingspeak.com/channels/900849/fields/1?api_key=HKJF50PJ4NF1ZGC2")
 todos = json.loads(response.text)
 
 #print(todos['feeds'])
@@ -75,13 +75,13 @@ col1 = data['col']
 dates = mdates.num2date(mdates.datestr2num(data['date']))
 plt.xlabel('Time')
 fig,ax1 = plt.subplots()
-ax1.set_title('Temp vs Time')
-strig="Temp (in "+chr(176)+"C)"
+ax1.set_title('CO vs Time')
+strig="CO in ppm"
 ax1.set(xlabel='Time',ylabel=strig)
 #img=plt.imread("afternoon.jpeg")
 #ax1.imshow(img,extent=[0,100,0,100])
 #ax1.ylabel({'PM2.5','(in ppm)'})
-ax1.set_ylim([20,50])
+ax1.set_ylim([0,30])
 ax1.plot(dates,col1)
 fig.autofmt_xdate()
 #plt.show()
