@@ -43,13 +43,16 @@ bool sensorConnected;
 #define SECRET_PASS7 "justmonika"
 #define SECRET_SSID8 "yoogottam"
 #define SECRET_PASS8 "plis_/\\_plis"
+#define SECRET_SSID9 "CHD"
+#define SECRET_PASS9 "F326@36968237"
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////   MAIN WIFI DETAILS OF DEPLOYMENT SITE /////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAIN_SSID "Mishuku"
-#define MAIN_PASS "setagaya"
+#define MAIN_SSID SECRET_SSID9
+#define MAIN_PASS SECRET_PASS9
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -80,18 +83,18 @@ char ssid[] = MAIN_SSID;                      // your network SSID (name)
 char pass[] = MAIN_PASS;                      // your network password
 char WIFI_SSID[] = MAIN_SSID;                 // WiFi for ThingSpeak part
 char WIFI_PSWD[] = MAIN_PASS;                 // WiFi for OneM2M part
-unsigned long myChannelNumber1 = 900845;         // DHT SENSOR
-unsigned long myChannelNumber2 = 900846;         // NOVA PM SENSOR
-unsigned long myChannelNumber3 = 900848;         // VOC AND CO2 GAS SENSOR
-unsigned long myChannelNumber4 = 900849;         // MULTICHANNEL GAS SENSOR
+unsigned long myChannelNumber1 = 911115;         // DHT SENSOR
+unsigned long myChannelNumber2 = 911117;         // NOVA PM SENSOR
+unsigned long myChannelNumber3 = 911120;         // VOC AND CO2 GAS SENSOR
+unsigned long myChannelNumber4 = 911122;         // MULTICHANNEL GAS SENSOR
 unsigned long myChannelNumber1_error = 889198;   // ERROR FOR NODE 1
 unsigned long myChannelNumber2_error = 889198;   // ERROR FOR NODE 1
 unsigned long myChannelNumber3_error = 889198;   // ERROR FOR NODE 1
 unsigned long myChannelNumber4_error = 889198;   // ERROR FOR NODE 1
-const char *myWriteAPIKey1 = "MJ7O2FZ34Q8138F5"; // DHT22
-const char *myWriteAPIKey2 = "DGSJGDKEZBMKBSCW"; // SDS011
-const char *myWriteAPIKey3 = "HF5G68OFZMZC81XB"; // SGP30
-const char *myWriteAPIKey4 = "2O2P90MY64BMVXYI"; // MiCS6814
+const char *myWriteAPIKey1 = "C59WT849COIU6775"; // DHT22
+const char *myWriteAPIKey2 = "BUN356CUNG1KH1SE"; // SDS011
+const char *myWriteAPIKey3 = "JRMQP55VZVGSH1RN"; // SGP30
+const char *myWriteAPIKey4 = "7H2PSN7VVW3387Z0"; // MiCS6814
 const char *myWriteAPIKey_error1 = "7CW3LB57A1AT55UC"; //node_1
 const char *myWriteAPIKey_error2 = "EWF0EVL573HCI4JS"; //node_2
 const char *myWriteAPIKey_error3 = "MLCI9LXWTRBOJUMI"; //node_3
@@ -321,24 +324,24 @@ void setup()
   Serial.println("Set wio link power!");
   delay(500);
 #endif
-  unsigned long int start = millis();
-  while (sgp_probe() != STATUS_OK && (millis() - start < REQUEST_TIME_OUT))
-  {
-    Serial.println("SGP failed");
-    while (1 && (millis() - start < REQUEST_TIME_OUT))
-      ;
-  }
-  err = sgp_measure_signals_blocking_read(&scaled_ethanol_signal,
-                                          &scaled_h2_signal);
-  if (err == STATUS_OK)
-  {
-    Serial.println("get ram signal!");
-  }
-  else
-  {
-    Serial.println("error reading signals");
-  }
-  err = sgp_iaq_init();
+//  unsigned long int start = millis();
+//  while (sgp_probe() != STATUS_OK && (millis() - start < REQUEST_TIME_OUT))
+//  {
+//    Serial.println("SGP failed");
+//    while (1 && (millis() - start < REQUEST_TIME_OUT))
+//      ;
+//  }
+//  err = sgp_measure_signals_blocking_read(&scaled_ethanol_signal,
+//                                          &scaled_h2_signal);
+//  if (err == STATUS_OK)
+//  {
+//    Serial.println("get ram signal!");
+//  }
+//  else
+//  {
+//    Serial.println("error reading signals");
+//  }
+//  err = sgp_iaq_init();
 
   //     TESTING THE SENSOR DHT
   Serial.println(F("DHTxx test!"));
@@ -420,25 +423,25 @@ void loop()
   Serial.println(F("°F"));
 
   // SGP CODE
-  s16 err = 0;
-  u16 tvoc_ppb, co2_eq_ppm;
-  err = sgp_measure_iaq_blocking_read(&tvoc_ppb, &co2_eq_ppm);
-  if (err == STATUS_OK)
-  {
-    Serial.print("tVOC  Concentration:");
-    Serial.print(tvoc_ppb);
-    string_tvoc = String(tvoc_ppb);
-    Serial.println("ppb");
-
-    Serial.print("CO2eq Concentration:");
-    string_co2 = String(co2_eq_ppm);
-    Serial.print(co2_eq_ppm);
-    Serial.println("ppm");
-  }
-  else
-  {
-    Serial.println("error reading IAQ values\n");
-  }
+//  s16 err = 0;
+//  u16 tvoc_ppb, co2_eq_ppm;
+//  err = sgp_measure_iaq_blocking_read(&tvoc_ppb, &co2_eq_ppm);
+//  if (err == STATUS_OK)
+//  {
+//    Serial.print("tVOC  Concentration:");
+//    Serial.print(tvoc_ppb);
+//    string_tvoc = String(tvoc_ppb);
+//    Serial.println("ppb");
+//
+//    Serial.print("CO2eq Concentration:");
+//    string_co2 = String(co2_eq_ppm);
+//    Serial.print(co2_eq_ppm);
+//    Serial.println("ppm");
+//  }
+//  else
+//  {
+//    Serial.println("error reading IAQ values\n");
+//  }
 
   // SDS011
   error = my_sds.read(&p25, &p10);
@@ -453,7 +456,7 @@ void loop()
   // MiCS 6814
   if (sensorConnected)
   {
-    string_CO = sensor.measureCO();
+    string_CO = sensor.measureCO()/4;
     string_NO2 = sensor.measureNO2();
     string_NH3 = sensor.measureNH3();
 

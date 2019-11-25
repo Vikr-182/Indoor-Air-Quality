@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import csv
 import os
 import requests
+import numpy
+import statistics
 
 URL = "http://api.thingspeak.com/channels/864235/feed.csv?results=8000"
 download = requests.get(URL).content.decode('utf-8')#.split("\n",1)[1]
@@ -21,8 +23,6 @@ for i in download.split('\n'):
     dict3[j[0]] = j[3]
     print(dict1[j[0]])
     jj = jj + 1
-    if jj > 5:
-        break;
 
 
 '''

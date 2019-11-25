@@ -43,13 +43,15 @@ bool sensorConnected;
 #define SECRET_PASS7 "justmonika"
 #define SECRET_SSID8 "yoogottam"
 #define SECRET_PASS8 "plis_/\\_plis"
+#define SECRET_SSID9 "CHD"
+#define SECRET_PASS9 "F326@36968237"
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////   MAIN WIFI DETAILS OF DEPLOYMENT SITE /////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAIN_SSID SECRET_SSID
-#define MAIN_PASS SECRET_PASS
+#define MAIN_SSID SECRET_SSID9
+#define MAIN_PASS SECRET_PASS9
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -111,13 +113,13 @@ uint32_t delayMS;
 
 // ##################### Update the Wifi SSID, Password and IP adress of the server ##########
 // WIFI params
-String CSE_IP = "139.59.42.21";
+String CSE_IP = "http://onem2m.iiit.ac.in";
 // #######################################################
 
 int WIFI_DELAY = 100; //ms
 
 // oneM2M : CSE params
-int CSE_HTTP_PORT = 8080;
+int CSE_HTTP_PORT = 80;
 String CSE_NAME = "in-name";
 String CSE_M2M_ORIGIN = "admin:admin";
 
@@ -321,25 +323,25 @@ void setup()
   Serial.println("Set wio link power!");
   delay(500);
 #endif
-  unsigned long int start = millis();
-  while (sgp_probe() != STATUS_OK && (millis() - start < REQUEST_TIME_OUT))
-  {
-    Serial.println("SGP failed");
-    while (1 && (millis() - start < REQUEST_TIME_OUT))
-      ;
-  }
-  err = sgp_measure_signals_blocking_read(&scaled_ethanol_signal,
-                                          &scaled_h2_signal);
-  if (err == STATUS_OK)
-  {
-    Serial.println("get ram signal!");
-  }
-  else
-  {
-    Serial.println("error reading signals");
-  }
-  err = sgp_iaq_init();
-
+//  unsigned long int start = millis();
+//  while (sgp_probe() != STATUS_OK && (millis() - start < REQUEST_TIME_OUT))
+//  {
+//    Serial.println("SGP failed");
+//    while (1 && (millis() - start < REQUEST_TIME_OUT))
+//      ;
+//  }
+//  err = sgp_measure_signals_blocking_read(&scaled_ethanol_signal,
+//                                          &scaled_h2_signal);
+//  if (err == STATUS_OK)
+//  {
+//    Serial.println("get ram signal!");
+//  }
+//  else
+//  {
+//    Serial.println("error reading signals");
+//  }
+//  err = sgp_iaq_init();
+//
   //     TESTING THE SENSOR DHT
   Serial.println(F("DHTxx test!"));
   WiFi.mode(WIFI_STA);
@@ -420,25 +422,25 @@ void loop()
   Serial.println(F("°F"));
 
   // SGP CODE
-  s16 err = 0;
-  u16 tvoc_ppb, co2_eq_ppm;
-  err = sgp_measure_iaq_blocking_read(&tvoc_ppb, &co2_eq_ppm);
-  if (err == STATUS_OK)
-  {
-    Serial.print("tVOC  Concentration:");
-    Serial.print(tvoc_ppb);
-    string_tvoc = String(tvoc_ppb);
-    Serial.println("ppb");
-
-    Serial.print("CO2eq Concentration:");
-    string_co2 = String(co2_eq_ppm);
-    Serial.print(co2_eq_ppm);
-    Serial.println("ppm");
-  }
-  else
-  {
-    Serial.println("error reading IAQ values\n");
-  }
+//  s16 err = 0;
+//  u16 tvoc_ppb, co2_eq_ppm;
+//  err = sgp_measure_iaq_blocking_read(&tvoc_ppb, &co2_eq_ppm);
+//  if (err == STATUS_OK)
+//  {
+//    Serial.print("tVOC  Concentration:");
+//    Serial.print(tvoc_ppb);
+//    string_tvoc = String(tvoc_ppb);
+//    Serial.println("ppb");
+//
+//    Serial.print("CO2eq Concentration:");
+//    string_co2 = String(co2_eq_ppm);
+//    Serial.print(co2_eq_ppm);
+//    Serial.println("ppm");
+//  }
+//  else
+//  {
+//    Serial.println("error reading IAQ values\n");
+//  }
 
   // SDS011
   error = my_sds.read(&p25, &p10);
