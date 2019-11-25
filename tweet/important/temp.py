@@ -5,38 +5,34 @@ import matplotlib.dates as mdates
 import csv
 import os
 import requests
-import statistics
-
-URL = "http://api.thingspeak.com/channels/864235/feed.csv?results=8000"
-download = requests.get(URL).content.decode('utf-8')#.split("\n",1)[1]
-#print(download.split(','))
-
-jj=0
-dict1={}
-dict2={}
-dict3={}
-for i in download.split('\n'):
-    print(i.split(','))
-    j = i.split(',')
-    dict1[j[0]] = j[1]
-    dict2[j[0]] = j[2]
-    dict3[j[0]] = j[3]
-    print(dict1[j[0]])
-    jj = jj + 1
-
-
-'''
-=======
 import numpy as np
 import json
 import requests
 import datetime
+import time
 from datetime import timedelta
 
-response = requests.get("https://api.thingspeak.com/channels/864607/fields/1?api_key=HKJF50PJ4NF1ZGC2")
+response = requests.get("https://api.thingspeak.com/channels/864235/fields/1?api_key=HKJF50PJ4NF1ZGC2")
 todos = json.loads(response.text)
 
+morningtime=datetime.datetime(2009, 12, 2, 9, 00, 00).time()
+afternoontime=datetime.datetime(2009, 12, 2, 14, 00, 00).time()
+dusktime=datetime.datetime(2009, 12, 2, 17, 00, 00).time()
+nighttime=datetime.datetime(2009, 12, 2, 20, 00, 00).time()
+dawntime=datetime.datetime(2009, 12, 2, 4, 00, 00).time()
 #print(todos['feeds'])
+
+def foobar(isafternoon,isdawn,isdusk,ismorning,isnight):
+    if isafternoon is 1:
+        return plt.imread("afternoon.jpeg")
+    elif isdawn is 1:
+        return plt.imread("dawn.jpeg")
+    elif isdusk is 1:
+        return plt.imread("dusk.jpeg")
+    elif ismorning is 1:
+        return plt.imread("morning.jpeg")
+    elif isnight is 1:
+        return plt.imread("night.jpeg")
 
 #print(todos)
 j = 0
@@ -73,7 +69,7 @@ for i in todos['feeds']:
     k = k + 1
     cs.append(j)
     an.append(str(dateobject2 + timedelta(hours=5)+timedelta(minutes=30)))
-    pr.append(i['field1'])
+    pr.append(float(i['field1']))
 
 
 datatypes = [('date','S20'),('col','float32')]
@@ -83,6 +79,27 @@ mean=np.mean(li)
 variance=np.var(li)
 high=max(li)
 low=min(li)
+
+comparetime=enddate.time()
+print(str(comparetime))
+print("Bi")
+
+if comparetime >= nighttime:
+    isnight = 1
+elif comparetime >= dusktime:
+    isdusk = 1
+elif comparetime >= afternoontime:
+    isafternoon = 1
+elif comparetime >= morningtime:
+    ismorning = 1
+elif comparetime >= dawntime:
+    isdawn = 1
+else:
+    isnight = 1
+
+print("Hi")
+print(isdawn,ismorning,isafternoon,isdusk,isnight)
+print("fi")
 
 print(mean)
 print(variance)
@@ -97,16 +114,25 @@ col1 = data['col']
 dates = mdates.num2date(mdates.datestr2num(data['date']))
 plt.xlabel('Time')
 fig,ax1 = plt.subplots()
-ax1.set_title('PM2.5 Concentration')
-ax1.set(xlabel='Time',ylabel='PM2.5 in ppm')
-#img=plt.imread("afternoon.jpeg")
-#ax1.imshow(img,extent=[0,100,0,100])
+ax1.set_title('Temp vs Time ')
+ax1.set(xlabel='Time',ylabel='Temp in ' + chr(176)+'C')
+
+img=foobar(isafternoon,isdawn,isdusk,ismorning,isnight)
+ax1.imshow(img, extent=[0,len(dates), 0, 50])
+
 #ax1.ylabel({'PM2.5','(in ppm)'})
-ax1.plot(dates,col1)
+#ax1.set_ylim([0,1000])
+ax1.plot(range(len(dates)),col1)
+start, end = ax1.get_xlim()
+xticks = [str(dates[i].time())[0:8] for i in range(0, len(dates), int(len(dates)/9))]
+
+#xticks = [str(i) for i in dates]
+#xticks = [i.split(' ')[1] for i in xticks]
+print(xticks[1])
+plt.xticks(range(int(start), int(end), int((end - start)/9)),xticks)
 fig.autofmt_xdate()
 #plt.show()
 plt.savefig('foo.png')
-
 
 consumer_key = 'TynhLBXGxZepWH0WQVf26QdpV'
 consumer_secret = 'n7hBsbrQXUTmRgps9pmPYNl85OKy3qyHd15fOZ7W7TD6lM3Rek'
@@ -132,5 +158,5 @@ if file is None:
     print("Eror")
 else:
     data=file.read()
-    r = api.request('statuses/update_with_media', {'status': str(message)},{'media[]':data})
+    r = api.request('statuses/update_with_media', {'status': str(message+"\nHi")},{'media[]':data})
     print( 'SUCCESS' if r.status_code == 200 else 'FAILURE' )

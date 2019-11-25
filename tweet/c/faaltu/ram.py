@@ -5,28 +5,6 @@ import matplotlib.dates as mdates
 import csv
 import os
 import requests
-import statistics
-
-URL = "http://api.thingspeak.com/channels/864235/feed.csv?results=8000"
-download = requests.get(URL).content.decode('utf-8')#.split("\n",1)[1]
-#print(download.split(','))
-
-jj=0
-dict1={}
-dict2={}
-dict3={}
-for i in download.split('\n'):
-    print(i.split(','))
-    j = i.split(',')
-    dict1[j[0]] = j[1]
-    dict2[j[0]] = j[2]
-    dict3[j[0]] = j[3]
-    print(dict1[j[0]])
-    jj = jj + 1
-
-
-'''
-=======
 import numpy as np
 import json
 import requests

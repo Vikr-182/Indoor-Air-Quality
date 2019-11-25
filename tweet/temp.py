@@ -5,35 +5,13 @@ import matplotlib.dates as mdates
 import csv
 import os
 import requests
-import statistics
-
-URL = "http://api.thingspeak.com/channels/864235/feed.csv?results=8000"
-download = requests.get(URL).content.decode('utf-8')#.split("\n",1)[1]
-#print(download.split(','))
-
-jj=0
-dict1={}
-dict2={}
-dict3={}
-for i in download.split('\n'):
-    print(i.split(','))
-    j = i.split(',')
-    dict1[j[0]] = j[1]
-    dict2[j[0]] = j[2]
-    dict3[j[0]] = j[3]
-    print(dict1[j[0]])
-    jj = jj + 1
-
-
-'''
-=======
 import numpy as np
 import json
 import requests
 import datetime
 from datetime import timedelta
 
-response = requests.get("https://api.thingspeak.com/channels/864607/fields/1?api_key=HKJF50PJ4NF1ZGC2")
+response = requests.get("https://api.thingspeak.com/channels/900845/fields/1?api_key=HKJF50PJ4NF1ZGC2")
 todos = json.loads(response.text)
 
 #print(todos['feeds'])
@@ -97,17 +75,17 @@ col1 = data['col']
 dates = mdates.num2date(mdates.datestr2num(data['date']))
 plt.xlabel('Time')
 fig,ax1 = plt.subplots()
-ax1.set_title('PM2.5 Concentration')
-ax1.set(xlabel='Time',ylabel='PM2.5 in ppm')
+ax1.set_title('Temp vs Time')
+strig="Temp (in "+chr(176)+"C)"
+ax1.set(xlabel='Time',ylabel=strig)
 #img=plt.imread("afternoon.jpeg")
 #ax1.imshow(img,extent=[0,100,0,100])
 #ax1.ylabel({'PM2.5','(in ppm)'})
+ax1.set_ylim([20,50])
 ax1.plot(dates,col1)
 fig.autofmt_xdate()
 #plt.show()
 plt.savefig('foo.png')
-
-
 consumer_key = 'TynhLBXGxZepWH0WQVf26QdpV'
 consumer_secret = 'n7hBsbrQXUTmRgps9pmPYNl85OKy3qyHd15fOZ7W7TD6lM3Rek'
 access_token = '1192421889815105536-B6osx8nZSbh6oi7ORt5ydybBZMVpSL'
