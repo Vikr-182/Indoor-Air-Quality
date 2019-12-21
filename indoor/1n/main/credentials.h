@@ -13,13 +13,15 @@ typedef int ll;
 #define SP1 "e5W-eMai@3!20hOct"
 #define SS2 "JioFi_20FDD75"
 #define SP2 "ikhmeawitq"
+#define SS3 "esw-m19@iiit"
+#define SP3 "e5W-eMai@3!20hOct"
 //Define the ssid and passwords
 
 
 //--------Make changes here  "----------------------------------------------------- 
 
-#define MAIN_SSID SS
-#define MAIN_PASS SP
+#define MAIN_SSID SS3
+#define MAIN_PASS SP3
 
 //-------------------------------------------------------------------------------
 
@@ -100,7 +102,7 @@ SDS011 my_sds;
 MiCS6814 sensor;
 bool sensorConnected;
 
-#define DHTPIN 2
+#define DHTPIN D5
 int number = 0;
 
 #define DHTTYPE DHT22 // DHT 22  (AM2302), AM2321
