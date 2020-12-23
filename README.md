@@ -18,7 +18,6 @@ We designed the enclosure for our model using Autodesk Fusion360 and 3D printed 
 Notice the spike, which is representative of the cooking period in the kitchen.
 
 - We specially collected our data during the Diwali festival and noticed anomalies in the data - 
-
 ![3D Model](./docs/imgs/graph.png)
 
 Notice the read peak and slight normalization after due process.
