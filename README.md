@@ -13,7 +13,11 @@ We designed the enclosure for our model using Autodesk Fusion360 and 3D printed 
 ![3D Model](./docs/imgs/image.png)
 
 #### Collecting and Analyzing Data
-We specially collected our data during the Diwali scenario and noticed anomalies in the data - 
+We specially collected our data during the Diwali festival and noticed anomalies in the data - 
+
+![3D Model](./docs/imgs/graph.png)
+
+Notice the read peak and slight normalization after due process.
 
 #### OneM2M Usage
 OneM2M was used as a common container for holding data and servicing REST APIs to and from.
@@ -21,6 +25,7 @@ OneM2M was used as a common container for holding data and servicing REST APIs t
 
 #### Twitter Alerts
 Frequent time-to-time alerts were issued at this account here. 
+
 ![3D Model](./docs/imgs/twitter.png)
 
 ## Software Used
