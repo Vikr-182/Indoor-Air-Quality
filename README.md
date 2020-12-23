@@ -15,8 +15,8 @@ We designed the enclosure for our model using Autodesk Fusion360 and 3D printed 
 ### Collecting and Analyzing Data
 - We were able to accurately predict the cooking times after carefully looking at the data - 
 ![3D Model](./docs/imgs/Histogram.png)
-Notice the spike, which is representative of the cooking period in the kitchen.
 
+Notice the spike, which is representative of the cooking period in the kitchen.
 - We specially collected our data during the Diwali festival and noticed anomalies in the data - 
 ![3D Model](./docs/imgs/graph.png)
 
