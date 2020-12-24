@@ -5,14 +5,18 @@ A complete Air Quality Index (AQI) sensing and management system designed and de
 
 ## Components Involved
 We list one by one, all the components involved in the usage -
-### Using Microcontroller ESP8266
-We used the ESP8266 Microcontroller as our primary microcontroller.
+- Using Microcontroller ESP8266
+- Designing the 3D Enclosure
+- Collecting and Analyzing Data
+- Twitter Alerts
+- OneM2M Usage
 
-#### Desigining the case
+
+## Desigining the case
 We designed the enclosure for our model using Autodesk Fusion360 and 3D printed it at Product Labs, IIITH.
 ![3D Model](./docs/imgs/image.png)
 
-### Collecting and Analyzing Data
+## Collecting and Analyzing Data
 - We were able to accurately predict the cooking times after carefully looking at the data - 
 ![3D Model](./docs/imgs/Histogram.png)
 
@@ -22,14 +26,14 @@ Notice the spike, which is representative of the cooking period in the kitchen.
 
 Notice the read peak and slight normalization after due process.
 
-### OneM2M Usage
-OneM2M was used as a common container for holding data and servicing REST APIs to and from.
-![3D Model](./docs/imgs/onem2m.jpg)
-
-### Twitter Alerts
+## Twitter Alerts
 Frequent time-to-time alerts were issued at this account [here](https://twitter.com/iiith_indoor). 
 
 ![3D Model](./docs/imgs/twitter.png)
+
+## OneM2M Usage
+OneM2M was used as a common container for holding data and servicing REST APIs to and from.
+![3D Model](./docs/imgs/onem2m.jpg)
 
 ## Software Used
 - The following software were used in our project and will be required to successfully replicate our product -
