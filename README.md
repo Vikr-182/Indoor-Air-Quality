@@ -27,7 +27,7 @@ OneM2M was used as a common container for holding data and servicing REST APIs t
 ![3D Model](./docs/imgs/onem2m.jpg)
 
 ### Twitter Alerts
-Frequent time-to-time alerts were issued at this account here. 
+Frequent time-to-time alerts were issued at this account [here](https://twitter.com/iiith_indoor). 
 
 ![3D Model](./docs/imgs/twitter.png)
 
